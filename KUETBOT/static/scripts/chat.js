@@ -51,11 +51,15 @@ firstBotMessage();
 
 // Retrieves the response
 function getHardResponse(userText) {
-    let botResponse = getBotResponse(userText);
-    let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
+    //calls python and gets response
+    fetch(`/botResponse/${userText}`)
+    .then(response => response.text())
+    .then((response) => {
+        let botHtml = '<p class="botText"><span>' + response + '</span></p>';
     $("#chatbox").append(botHtml);
 
     document.getElementById("chat-bar-bottom").scrollIntoView(true);
+    })
 }
 
 //Gets the text text from the input box and processes it
