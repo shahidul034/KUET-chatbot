@@ -1,18 +1,22 @@
 #render template renders html from render folder
-from flask import Flask, redirect,render_template, request,redirect
-from datetime import datetime
-import logging
+from flask import Flask,render_template
 import sys
-
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-import random
-import string
-import nltk
+import nltk, os, sys
 import requests
+
 #new instance of flask
-app = Flask(__name__)
+if getattr(sys, 'frozen', False):
+    # we are running in a bundle
+    bundle_dir = sys._MEIPASS
+    template_folder = bundle_dir + '/templates'
+    static_folder = bundle_dir + '/static'
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+else:
+    # we are running in a normal Python environment
+    bundle_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 #global list
 sentenceList = nltk.sent_tokenize("demo")
@@ -23,12 +27,14 @@ sentenceList = nltk.sent_tokenize("demo")
 #if a route has post or get forms, needs to be defined
 @app.route("/", methods=['GET','POST'])
 def hello_world():
-    nltk.download('punkt')
+    #nltk.download('punkt')
+    sentenceUpdate()
     return render_template('index.html')
 
+#this is called by javascript to get response
 @app.route("/botResponse/<userText>", methods=['GET','POST'])
 def botResponse(userText):
-    sentenceUpdate()
+    #sentenceUpdate()
     sentenceList.append(userText)
     bot_response=''
     cm=CountVectorizer().fit_transform(sentenceList)
@@ -47,8 +53,10 @@ def botResponse(userText):
             break
     if response_flag==0:
         bot_response=bot_response+' '+"I apologize, I don't understand."
+    sentenceList.remove(userText)
     return bot_response  
 
+#Updates sentence main sentence list
 def sentenceUpdate():
     url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/KUETBOT/KUETBOT/static/Software-Project-Data.txt'
     page = requests.get(url)
@@ -56,6 +64,7 @@ def sentenceUpdate():
     global sentenceList
     sentenceList = nltk.sent_tokenize(text)
 
+#sorting method for sorting result quality
 def index_sort(list_var):
   length=len(list_var)
   list_index=list(range(0,length))
