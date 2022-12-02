@@ -1,10 +1,11 @@
 #render template renders html from render folder
 from flask import Flask,render_template
-import sys
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import nltk, os, sys
 import requests
+
+#pyinstaller C:\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\app.py --add-data "C:\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\templates;templates" --add-data "C:\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static;static"
 
 #new instance of flask
 if getattr(sys, 'frozen', False):
@@ -16,6 +17,7 @@ if getattr(sys, 'frozen', False):
 else:
     # we are running in a normal Python environment
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
+    app = Flask(__name__)
 
 
 #global list
@@ -58,11 +60,13 @@ def botResponse(userText):
 
 #Updates sentence main sentence list
 def sentenceUpdate():
-    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/KUETBOT/KUETBOT/static/Software-Project-Data.txt'
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
     page = requests.get(url)
     text = page.text
+    #text = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
     global sentenceList
-    sentenceList = nltk.sent_tokenize(text)
+    #sentenceList = nltk.sent_tokenize(text)
+    sentenceList = text.split(" /")
 
 #sorting method for sorting result quality
 def index_sort(list_var):
