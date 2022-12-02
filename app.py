@@ -2,7 +2,7 @@ from flask import Flask, redirect,render_template, request,redirect
 from datetime import datetime
 import logging
 import sys
-
+import re
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -57,16 +57,30 @@ def bot_response(user_input,sent_list):
     bot_response=bot_response+' '+"I apologize , I don't understand."
   sent_list.remove(user_input)
   return bot_response  
-
-
-
+def searching(res,text):
+   search1=re.search("\|\|.*\|\|", res)
+   if search1:
+      ans=(search1.group()).replace("|","")
+      search_string="\|\|"+ans+"\|\|.*"+"[["+ans+"]]"
+      search2 = re.search(search_string, text)
+      if search2:
+          msg=search2.group().replace("|","")
+          msg=msg.replace("[","")
+          msg=msg.replace("]","")
+          msg=msg.replace(ans,"")
+          return 1,msg
+      else:
+         return 0,""
+   else:
+      return 0,""
+   
 @app.route("/",methods=['GET','POST'])
 def hello_world():
     nltk.download('punkt',quiet=True)
-    url = r'https://raw.githubusercontent.com/shahidul034/uttara-university-chatbot-data/main/uttara%20university%20chatbot%20data.txt'
-    page = requests.get(url)
-    corpus=page.text
-    text=corpus
+    # url = r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/Software-Project-Data.txt'
+    # page = requests.get(url,verify=False)
+    # corpus=page.text
+    text=open(r"C:\Users\Inception\Desktop\python project dev\uttara chatbot\static\Software-Project-Data.txt","r",encoding="utf-8").read()
     sent_list=nltk.sent_tokenize(text)
     user_input=""
     msg=""
@@ -84,11 +98,10 @@ def hello_world():
             else:
                 res=bot_response(user_input,sent_list)
                 msg=res
-        
-
+                flag,out=searching(res,text)
+                if flag:
+                   msg=out
     return render_template("index.html",msg=msg)
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
