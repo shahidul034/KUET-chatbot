@@ -69,11 +69,11 @@ def botResponse(userText):
 
 #Updates sentence main sentence list
 def sentenceUpdate():
-    # url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
-    # page = requests.get(url)
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
+    page = requests.get(url)
     global fullText
-    # fullText = page.text
-    fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
+    fullText = page.text
+    #fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
     global sentenceList
     #sentenceList = nltk.sent_tokenize(text)
     sentenceList = fullText.split(" /")
