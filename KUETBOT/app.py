@@ -23,6 +23,8 @@ else:
 #global list
 sentenceList = nltk.sent_tokenize("demo")
 fullText="demo"
+stopWords="demo"
+sentenceListFirstLine = ["demo"]
 
 
 #app.route gives the webpage where this functioni will be [triggered],
@@ -38,45 +40,55 @@ def hello_world():
 #this is called by javascript to get response
 @app.route("/botResponse/<userText>", methods=['GET','POST'])
 def botResponse(userText):
-    #print("MainFunction",file=sys.stderr)
-    sentenceList.append(userText)
     bot_response=''
-    cm=CountVectorizer(stop_words='english').fit_transform(sentenceList)
-    similarity_scores=cosine_similarity(cm[-1],cm)
-    similarity_scores_list=similarity_scores.flatten()
-    index=index_sort(similarity_scores_list)
-    
-    index=index[1:]
-    
-    response_flag=0
-    j=0
-    for i in range(len(index)):
-        if similarity_scores_list[index[i]]>0.0:
-            bot_response=bot_response+sentenceList[index[i]]
-            response_flag=1
-            j+=1
-        if j>0:
-            #j limits the number of results, 0 = only the first result
-            break
-    if response_flag==0:
-        bot_response=bot_response+' '+"I apologize, I don't understand."
-    else:
-        flag,out=searching(bot_response,fullText)
-        if flag:
-            bot_response=out
-    sentenceList.remove(userText)
-    return bot_response    
+    #at first only match the first lines for more accurate search, due to the nature of the dataset
+    firstLineFlag,matchIndex=checkBlocks(userText)
+    if firstLineFlag==1:
+        bot_response=bot_response+sentenceList[matchIndex]
+        return bot_response
+    else:  
+        sentenceList.append(userText)
+        cm=CountVectorizer(stop_words=stopWords).fit_transform(sentenceList)
+        similarity_scores=cosine_similarity(cm[-1],cm)
+        similarity_scores_list=similarity_scores.flatten()
+        index=index_sort(similarity_scores_list)
+        index=index[1:]
+        response_flag=0
+        j=0
+        for i in range(len(index)):
+            if similarity_scores_list[index[i]]>0.0:
+                bot_response=bot_response+sentenceList[index[i]]
+                response_flag=1
+                j+=1
+            if j>1:
+                break
+        if response_flag==0:
+            bot_response=bot_response+' '+"I apologize, I don't understand."
+        else:
+            flag,out=searching(bot_response,fullText)
+            if flag:
+                bot_response=out
+            else:
+                botResponse = RemoveBlock(botResponse)
+        sentenceList.remove(userText)
+        return bot_response    
 
 #Updates sentence main sentence list
 def sentenceUpdate():
-    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
-    page = requests.get(url)
     global fullText
-    fullText = page.text
-    #fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
+    global stopWords
     global sentenceList
-    #sentenceList = nltk.sent_tokenize(text)
-    sentenceList = fullText.split(" /")
+    global sentenceListFirstLine
+    sentenceListFirstLine.clear()
+    # url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
+    # page = requests.get(url)
+    # fullText = page.text
+    fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
+    stopWords = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\StopWords.txt",encoding="utf8").read().split()
+    sentenceList = fullText.split("||")
+    for block in sentenceList:
+        sentenceListFirstLine.append(block.split('\n')[0])
+
 
 #sorting method for sorting result quality
 def index_sort(list_var):
@@ -91,37 +103,56 @@ def index_sort(list_var):
         list_index[j]=temp
   return list_index
 
+#searches all the firstlines for to match first
+def checkBlocks(input):
+    global sentenceListFirstLine
+    sentenceListFirstLine.append(input)
+    cm=CountVectorizer(stop_words="english").fit_transform(sentenceListFirstLine)
+    similarity_scores=cosine_similarity(cm[-1],cm)
+    similarity_scores_list=similarity_scores.flatten()
+    index=index_sort(similarity_scores_list)
+    index=index[1:]
+    sentenceListFirstLine.remove(input)
+    if similarity_scores_list[index[0]]>0.0:
+        return 1,index[0]
+    else:
+        return 0,0
+    
+        
+
+
+
+
 #Checks for complete Regular expression blocks
 def searching(botResponse,fullText):
-    #print("In the link",file=sys.stderr)
     #search for occurence of block start
     search1=re.search("//.*//", botResponse)
-    ####fix here####
     if search1:
+        print("start block found",file=sys.stderr)
         ans=search1.group()
-        #print(ans,file=sys.stderr)
-        ans= ans.replace("/","")
-        #print(ans,file=sys.stderr)
+        ans= ans.replace("//","")
         #search_string="//"+ans+"//"+"(.*\n)*"+"\[\["+ans+"\]\]"
-        search_string = '(//'+ans+'//)(.+)((?:\n.+)+)(\[\['+ans+'\]\])'
+        search_string = '(//'+ans+'//)(.+)((?:\n.+)*)(\[\['+ans+'\]\])'
         #search for whole block including block end
-        search2 = re.search(search_string, fullText,re.MULTILINE)
+        search2 = re.search(search_string,fullText,re.MULTILINE)
         if search2:
+            print("whole block found",file=sys.stderr)
             msg=search2.group()
-            #print(msg+" foundsearch2",file=sys.stderr)
-            msg=re.sub("//.*//","",msg)
-            msg=re.sub("\[\[.*\]\]","",msg)
-            msg.replace(" /","")
-            #print(msg,file=sys.stderr)
+            msg = RemoveBlock(msg)
             return 1,msg
         else:
-            #print("notfound2",file=sys.stderr)
+            print("start block found but whole block not found",file=sys.stderr)
             return 0,"" 
     else:
+        print("start block not found",file=sys.stderr)
         #start block not found, replacing end block if exists
-        #print("found end with no start",file=sys.stderr)
-        botResponse=re.sub("\[\[.*\]\]","",botResponse)
+        botResponse=RemoveBlock(botResponse)
         return 1,botResponse
+
+def RemoveBlock(msg):
+    msg=re.sub("//.*//","",msg)
+    msg=re.sub("\[\[.*\]\]","",msg)
+    return msg
 
 if __name__ == "__main__":
     app.run(debug=True)
