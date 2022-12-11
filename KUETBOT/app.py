@@ -45,7 +45,8 @@ def botResponse(userText):
     firstLineFlag,matchIndex=checkBlocks(userText)
     if firstLineFlag==1:
         bot_response=bot_response+sentenceList[matchIndex]
-        return bot_response
+        flag,out=searching(bot_response,fullText)
+        return out
     else:  
         sentenceList.append(userText)
         cm=CountVectorizer(stop_words=stopWords).fit_transform(sentenceList)
@@ -74,17 +75,23 @@ def botResponse(userText):
         return bot_response    
 
 #Updates sentence main sentence list
+#Updates sentence main sentence list
 def sentenceUpdate():
     global fullText
     global stopWords
     global sentenceList
     global sentenceListFirstLine
     sentenceListFirstLine.clear()
-    # url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
-    # page = requests.get(url)
-    # fullText = page.text
-    fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
-    stopWords = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\StopWords.txt",encoding="utf8").read().split()
+    
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
+    page = requests.get(url)
+    fullText = page.text
+
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/StopWords.txt'
+    page = requests.get(url)
+    stopWords = page.text.split()
+    # fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\Software-Project-Data.txt",encoding="utf8").read()
+    # stopWords = open(r"C:\\Users\Administrator\Documents\Work\KUET-chatbot\KUETBOT\static\StopWords.txt",encoding="utf8").read().split()
     sentenceList = fullText.split("||")
     for block in sentenceList:
         sentenceListFirstLine.append(block.split('\n')[0])
@@ -119,10 +126,6 @@ def checkBlocks(input):
         return 0,0
     
         
-
-
-
-
 #Checks for complete Regular expression blocks
 def searching(botResponse,fullText):
     #search for occurence of block start
@@ -133,16 +136,22 @@ def searching(botResponse,fullText):
         ans= ans.replace("//","")
         #search_string="//"+ans+"//"+"(.*\n)*"+"\[\["+ans+"\]\]"
         search_string = '(//'+ans+'//)(.+)((?:\n.+)*)(\[\['+ans+'\]\])'
-        #search for whole block including block end
-        search2 = re.search(search_string,fullText,re.MULTILINE)
-        if search2:
-            print("whole block found",file=sys.stderr)
-            msg=search2.group()
-            msg = RemoveBlock(msg)
-            return 1,msg
+        #search for entire block in the found answer, if exists, ignore blocks and return already found result
+        search=re.search(search_string,botResponse,re.MULTILINE)
+        if search:
+            #an entire block exists in the already found result, no need to shorten it
+            return 1,RemoveBlock(botResponse)
         else:
-            print("start block found but whole block not found",file=sys.stderr)
-            return 0,"" 
+            #only starting of a block is found, search for whole block including block end in the fulltext and return
+            search2 = re.search(search_string,fullText,re.MULTILINE)
+            if search2:
+                print("whole block found",file=sys.stderr)
+                msg=search2.group()
+                msg = RemoveBlock(msg)
+                return 1,msg
+            else:
+                print("start block found but whole block not found",file=sys.stderr)
+                return 0,"" 
     else:
         print("start block not found",file=sys.stderr)
         #start block not found, replacing end block if exists
@@ -152,6 +161,7 @@ def searching(botResponse,fullText):
 def RemoveBlock(msg):
     msg=re.sub("//.*//","",msg)
     msg=re.sub("\[\[.*\]\]","",msg)
+    msg=re.sub("\|\|","",msg)
     return msg
 
 if __name__ == "__main__":
