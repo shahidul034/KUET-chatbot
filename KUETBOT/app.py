@@ -89,16 +89,20 @@ def sentenceUpdate():
     global sentenceListFirstLine
     sentenceListFirstLine.clear()
     
-    # url= r'https://raw.githubusercontent.com/shahidul034/KUET-everything/main/static/Software-Project-Data.txt'
-    # page = requests.get(url)
-    # fullText = page.text
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/Software-Project-Data.txt'
+    page = requests.get(url)
+    fullText = page.text
 
-    # url= r'https://raw.githubusercontent.com/shahidul034/KUET-everything/main/static/StopWords.txt'
-    # page = requests.get(url)
-    # stopWords = page.text.split()
-    fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-everything\static\Software-Project-Data.txt",encoding="utf8").read()
-    stopWords = open(r"C:\\Users\Administrator\Documents\Work\KUET-everything\static\StopWords.txt",encoding="utf8").read().split()
-    stopWords2 = open(r"C:\Users\Administrator\Documents\Work\KUET-everything\static\StopWords2.txt",encoding="utf8").read().split()
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/StopWords.txt'
+    page = requests.get(url)
+    stopWords = page.text.split()
+
+    url= r'https://raw.githubusercontent.com/shahidul034/KUET-chatbot/main/KUETBOT/static/StopWords2.txt'
+    page = requests.get(url)
+    stopWords2 = page.text.split()
+    # fullText = open(r"C:\\Users\Administrator\Documents\Work\KUET-everything\static\Software-Project-Data.txt",encoding="utf8").read()
+    # stopWords = open(r"C:\\Users\Administrator\Documents\Work\KUET-everything\static\StopWords.txt",encoding="utf8").read().split()
+    # stopWords2 = open(r"C:\Users\Administrator\Documents\Work\KUET-everything\static\StopWords2.txt",encoding="utf8").read().split()
     sentenceList = fullText.split("||")
     for block in sentenceList:
         sentenceListFirstLine.append(block.split('\n')[0])
