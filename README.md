@@ -11,6 +11,7 @@ Kuetbot is a simple chatbot designed to answer questions about Khulna University
 
 ## Download
 You can download the Kuetbot by clicking [here](https://github.com/shahidul034/KUET-chatbot/archive/refs/heads/main.zip) or by cloning the project using the following command:
+
 git clone https://github.com/shahidul034/KUET-chatbot.git
 
 ## How to Use
