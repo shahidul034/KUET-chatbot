@@ -14,10 +14,15 @@ You can download the Kuetbot by clicking [here](https://github.com/shahidul034/K
 
 `git clone https://github.com/shahidul034/KUET-chatbot.git`
 
+## How it works
+Kuetbot uses the `CountVectorizer` from the `scikit-learn` library to convert the text data into a numerical representation, which is then used to calculate the cosine similarity between the user's input and the answers stored in the dataset. The answer with the highest cosine similarity is returned as the most relevant response.
+
+The dataset is a slightly formatted text file, where new data can be added simply by appending it, following the established formatting.
+
 ## How to Use
-- Clone the project
+- Clone or download the project
 - Open the project in any Python IDE
 - Run the `app.py` file located in the `KUETBOT` folder.
 
 ## Disclaimer
-This is an alpha proof of concept version of Kuetbot. Expect bugs.
+This is an alpha version of Kuetbot as proof of concept. expect bugs.
