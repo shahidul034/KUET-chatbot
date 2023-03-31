@@ -10,7 +10,7 @@ Kuetbot is a simple chatbot designed to answer questions about Khulna University
 - scikit_learn==1.2.1
 
 ## Download
-You can download the Kuetbot by clicking [here](https://github.com/shahidul034/KUET-chatbot/archive/refs/heads/main.zip) or by cloning the project using the following command:
+You can download the pyinstaller build of Kuetbot by clicking [here](https://drive.google.com/file/d/1u7QfjB_wowc7ZRCFx1XIw1Wm1BlfXW8U/view?usp=share_link) or by cloning the project using the following command:
 
 `git clone https://github.com/shahidul034/KUET-chatbot.git`
 
@@ -26,9 +26,12 @@ The dataset is a slightly formatted text file, where new data can be added simpl
 
 
 ## How to Use
-- Clone or download the project
-- Open the project in any Python IDE
-- Run the `app.py` file located in the `KUETBOT` folder.
+### pyinstaller Build
+- Download the pyinstaller alpha build
+- Unzip
+- Go to /dist/app/
+- Run app.exe
+- Go to your browser and enter the address given in the newly opened terminal instance. http://127.0.0.1:5000 by default.
 
 ## Disclaimer
 This is an alpha version of Kuetbot as proof of concept. expect bugs.
