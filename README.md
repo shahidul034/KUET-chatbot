@@ -22,7 +22,7 @@ The dataset is a slightly formatted text file, where new data can be added simpl
 ## Screenshots
 ![Init](https://user-images.githubusercontent.com/49722623/229084528-6e572016-aedf-4f2b-8acd-3708783f3def.png)
 ![Query1](https://user-images.githubusercontent.com/49722623/229084558-8e27fbcc-8c8b-4915-91c1-efde02654fd6.png)
-![Query2](https://user-images.githubusercontent.com/49722623/229084594-6229ec5b-07f9-4004-b9e5-771845cf19b3.png)
+![Query3](https://user-images.githubusercontent.com/49722623/229086089-f7451e73-2f76-44ce-97a3-ce58cb6acb55.png)
 
 
 ## How to Use
