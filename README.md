@@ -19,6 +19,12 @@ Kuetbot uses the `CountVectorizer` from the `scikit-learn` library to convert th
 
 The dataset is a slightly formatted text file, where new data can be added simply by appending it, following the established formatting.
 
+## Screenshots
+![Init](https://user-images.githubusercontent.com/49722623/229084528-6e572016-aedf-4f2b-8acd-3708783f3def.png)
+![Query1](https://user-images.githubusercontent.com/49722623/229084558-8e27fbcc-8c8b-4915-91c1-efde02654fd6.png)
+![Query2](https://user-images.githubusercontent.com/49722623/229084594-6229ec5b-07f9-4004-b9e5-771845cf19b3.png)
+
+
 ## How to Use
 - Clone or download the project
 - Open the project in any Python IDE
